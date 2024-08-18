@@ -1,0 +1,7 @@
+pymongo==3.12.3
+djongo
+django
+dnspython
+pytz
+djangorestframework
+pydantic
