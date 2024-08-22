@@ -14,7 +14,7 @@ class CustomJWTAuthentication(JWTAuthentication):
         user_id = validated_token.get("user_id")
         if not user_id:
             raise InvalidToken("Token contained no recognizable user identification")
-        print(validated_token)
+
         # Convert the user_id string to a MongoDB ObjectId
         try:
             object_id = ObjectId(user_id)
@@ -26,6 +26,9 @@ class CustomJWTAuthentication(JWTAuthentication):
 
         if "_id" in user_data:
             user_data["_id"] = str(user_data["_id"])
+
+        if "role" in user_data:
+            user_data["role"] = str(user_data["role"])
         user = UserModel(**user_data)
         if not user.is_active:
             raise AuthenticationFailed("User is inactive")
@@ -64,4 +67,3 @@ class CustomJWTAuthentication(JWTAuthentication):
         request.user = None
 
         return {"message": "Successfully logged out"}
-        

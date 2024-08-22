@@ -13,10 +13,13 @@ from .utils import users_collection, roles_collection
 # function to get user data from MongoDB
 def get_user_from_mongodb(email: str) -> UserModel:
     user_data = users_collection.find_one({"email": email})
-    print(user_data)
+
     if user_data:
         # Ensure _id is included
+        # print(f" User fdata from Mogo {user_data}")
         user_data["_id"] = str(user_data.get("_id"))
+        user_data["role"] = str(user_data.get("role"))
+        print(f" User fdata from Mogo {user_data}")
         return UserModel(**user_data)
     else:
         raise ValueError("No user found")
@@ -61,12 +64,16 @@ class UserSerializer(serializers.Serializer):
         if "password" in validated_data:
             validated_data["password"] = make_password(validated_data["password"])
 
+        if "role" in validated_data:
+            role_id = roles_collection.find_one({"name": validated_data["role"]})
+            validated_data["role"] = role_id
+
         instance.update(validated_data)
         users_collection.update_one({"_id": instance["_id"]}, {"$set": validated_data})
         return instance
 
     def to_representation(self, instance):
-        role_name = instance.get("role", "")
+        role_name = str(instance.get("role", ""))
         return {
             "id": str(instance.get("_id", "")),
             "email": instance["email"],
@@ -90,7 +97,9 @@ class CustomTokenSerializer(serializers.Serializer):
             raise AuthenticationFailed("Email and password are required")
 
         try:
+            print(email)
             user = get_user_from_mongodb(email)
+            print(f"USER : {user}")
         except ValueError:
             raise AuthenticationFailed("No user found with this email")
         print(user)

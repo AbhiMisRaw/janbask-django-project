@@ -10,6 +10,11 @@ urlpatterns = [
         name="deactivate-user",
     ),
     path(
+        "users/<str:user_id>/roles/",
+        views.UserRoleView.as_view(),
+        name="role-user",
+    ),
+    path(
         "auth/token/",
         views.CustomLoginView.as_view(),
         name="login",

@@ -21,3 +21,4 @@ db = client.my_database
 users_collection = db.users
 roles_collection = db.roles
 token_blacklist = db.token_blacklist
+activity_collection = db.activities
