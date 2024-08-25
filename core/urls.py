@@ -15,9 +15,8 @@ urlpatterns = [
         name="role-user",
     ),
     path(
-        "auth/token/",
-        views.CustomLoginView.as_view(),
-        name="login",
+        "users/<str:user_id>/activity/",
+        views.UserActivityView.as_view(),
+        name="role-user",
     ),
-    path("auth/logout/", views.LogoutView.as_view(), name="logout"),
 ]

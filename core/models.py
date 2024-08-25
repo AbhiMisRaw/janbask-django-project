@@ -1,4 +1,5 @@
 # models.py
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
@@ -20,3 +21,14 @@ class UserModel(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
+
+
+class UserActivityModel(BaseModel):
+    user_email: str
+    action: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    status: str
+    details: dict = Field(default_factory=dict)
+
+    class Config:
+        arbitrary_types_allowed = True

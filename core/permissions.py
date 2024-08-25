@@ -25,9 +25,9 @@ class UserPermission(BasePermission):
 
         # Retrieve the user's role from MongoDB
         role_id = user.role
-        print(user)
+
         if role_id is None or role_id == "None":
-            print("No role is assigned")
+
             return False
         role = roles_collection.find_one({"_id": ObjectId(role_id)})
 
@@ -55,9 +55,9 @@ class AdminPermission(BasePermission):
 
         # Retrieve the user's role from MongoDB
         role_id = user.role
-        print(user)
+
         if role_id is None or role_id == "None":
-            print("No role is assigned")
+
             return False
         role = roles_collection.find_one({"_id": ObjectId(role_id)})
 
