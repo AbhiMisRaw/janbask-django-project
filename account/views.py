@@ -10,12 +10,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from core.authentication import CustomJWTAuthentication
 from core.serializers import CustomTokenSerializer
-
+from core.views import log_user_activity
 from core.utils import (
     users_collection,
-    activity_collection,
     password_token_collection,
-    send_email_to_user,
+    reset_password_email,
 )
 
 
@@ -53,6 +52,7 @@ class LogoutView(APIView):
 
 class UserForgetPasswordView(APIView):
     def post(self, request):
+        action = "Chaning password Request"
         email = request.data.get("email")
         if email is None or email == "":
             return Response(
@@ -79,7 +79,9 @@ class UserForgetPasswordView(APIView):
         )
 
         # Send response with the full reset link
-        reset_link = f"http://localhost:8000/api/v1/user/password/recover/{token}"
+        reset_link = f"http://localhost:8000/api/v1/account/password/recover/{token}/"
+        reset_password_email(email, reset_link)
+        log_user_activity(email, action, "success")
         return Response(
             {
                 "message": "Link has been sent to you mail and It's valid for 10 mins",
@@ -91,6 +93,7 @@ class UserForgetPasswordView(APIView):
 
 class UserSetPasswordView(APIView):
     def post(self, request, token):
+        action = "password reset"
         # Find the token in the database
         if len(token) != 50:
             return Response(
@@ -116,8 +119,10 @@ class UserSetPasswordView(APIView):
         # Check if the token is expired (more than 10 minutes old)
         token_creation_time = token_entry["created_at"]
         if datetime.utcnow() > token_creation_time + timedelta(minutes=10):
+            message = {"error": "Token has expired. Please try again."}
+            log_user_activity(token_entry.get("email"), action, "fail", message)
             return Response(
-                {"error": "Token has expired. Please try again."},
+                message,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -127,7 +132,7 @@ class UserSetPasswordView(APIView):
         users_collection.update_one(
             {"email": token_entry["email"]}, {"$set": {"password": hashed_password}}
         )
-
+        log_user_activity(token_entry.get("email"), action, "success")
         # Optionally, you may want to delete the token after it's been used
         password_token_collection.delete_one({"token": token})
 

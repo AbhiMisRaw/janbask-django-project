@@ -27,7 +27,6 @@ activity_collection = db.activities
 password_token_collection = db.password_tokens
 
 
-
 def send_email_to_user(user):
     subject = "Account Creation Confirmation "
     first_name = user.get("name").split()[0]
@@ -37,6 +36,19 @@ def send_email_to_user(user):
     print("Sending Mail for user  : ", user)
     # send_mail(subject, message, from_email, recipient_list)
     email = EmailMessage(subject, message, from_email, recipient_list)
-    x = email.send(fail_silently=True)
-    print(f" {email}  {x}")
-    print("Mail Sent")
+    try:
+        x = email.send()
+    except Exception:
+        print(Exception)
+
+
+def reset_password_email(send_to, link):
+    subject = "Passwoord Reset Link"
+    message = f"This link is only valid for 10 minute, use it to set your new password: : {link}"
+    from_email = settings.EMAIL_HOST
+    recipient_list = [send_to]
+    email = EmailMessage(subject, message, from_email, recipient_list)
+    try:
+        x = email.send()
+    except Exception:
+        print(Exception)

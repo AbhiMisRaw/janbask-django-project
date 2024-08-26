@@ -3,6 +3,7 @@
 
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -19,6 +20,17 @@ from .utils import (
     password_token_collection,
     send_email_to_user,
 )
+
+# Testing View for sending email
+# @api_view(["GET"])
+# def send_mail(request):
+#     user = {
+#         "name": "Avhi",
+#         "email": "sumitmm9506555798@gmail.com",
+#         "password": "123456",
+#     }
+#     send_email_to_user(user)
+#     return Response({"message": "OK"}, status=200)
 
 
 def log_user_activity(email, action, status, details=None):
@@ -63,7 +75,7 @@ class UserCreateView(APIView):
             }
 
             # Sending the email
-            # send_email_to_user(user)
+            send_email_to_user(user)
             user.pop("password")
             log_user_activity(request.user.email, action, "success", user)
             return Response(
